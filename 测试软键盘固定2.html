@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        input{-webkit-appearance:none;}
+
+        .layer{position:fixed;width:100%;height:100%;background-color:rgba(255,255,255,1);top:0;left:0;z-index:66;color:#fff;display:none;}
+        .page{padding:10px 10px 10px 50px;}
+        .top {
+            z-index:5;
+            /*position: fixed;*/
+            left:0;
+            top: 0;
+            height: 50px;
+            background-color: #fff;
+            width: 100%;
+            /*margin-top:100px;*/
+            color:#000;
+        }
+
+        .but {
+            z-index:5;
+            position: fixed;
+            left:0;
+            bottom: 0;
+            height: 80px;
+            background-color: red;
+            width: 100%;
+        }
+        .absolute{position:absolute !important;}
+        .opacity{opacity:0 !important;}
+
+        .main {
+            /*position: absolute;*/
+            top: 50px;
+            bottom: 50px;
+            width: 100%;
+            /* 使之可以滚动 */
+            overflow-y: scroll;
+            /* 增加该属性，可以增加弹性 */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .content {
+            overflow-y: scroll;
+        }
+        #hhh{display:none;}
+        #eee{opacity:1;width:1px;height:1px;position:absolute;top:0;left:-48px;}
+        #fix_bottom{position:fixed;left:0;bottom:0;width:100%;height:1px;background-color:yellow;z-index:100;}
+
+
+        .scale{width:20px;position:fixed;left:0;top:0;z-index:55;pointer-events:none;}
+        .scale li{width:100%;position:absolute;height:1px;background-color:blue;}
+        .scale li i{color:blue;right:-25px;position:absolute;top:-5px;line-height:1;font-size:12px;}
+    </style>
+</head>
+<body>
+<div class="layer"><!--加载中……--></div>
+<ul class="scale"></ul>
+<div class="page">
+    <!--<input type="file" name="fileDom" id="fileDom" accept="image/*" multep @change="change" />-->
+    <div class="top hspan">
+        <input id="abc" type="text" placeholder="abc" />
+        <input id="hhh" type="text" placeholder="hhh" />
+    </div>
+    <div class="main">
+        <!--<div class="content">
+            <div>1</div>
+            <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div> <div>1</div>
+        </div>-->
+    </div>
+    <div class="but"><input id="eee" type="text" />
+        <button >提交</button>
+        <a class="submit">提交</a>
+        <span class="span"></span>
+    </div>
+    <!--<div id="fix_bottom"></div>-->
+</div>
+<script src="js/jquery-3.1.1.min.js"></script>
+<script>
+    //判断访问终端
+    var browser = {
+        versions:function(){
+            var u = navigator.userAgent,
+                app = navigator.appVersion;
+            return {
+                trident: u.indexOf('Trident') > -1, //IE内核
+                presto: u.indexOf('Presto') > -1, //opera内核
+                webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,//火狐内核
+                mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                android: u.indexOf('Android') > -1 || u.indexOf('Adr') > -1, //android终端
+                iPhone: u.indexOf('iPhone') > -1 , //是否为iPhone或者QQHD浏览器
+                iPad: u.indexOf('iPad') > -1, //是否iPad
+                webApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+                weixin: u.indexOf('MicroMessenger') > -1, //是否微信 （2015-01-22新增）
+                qq: u.match(/\sQQ/i) == "qq" //是否QQ
+            };
+        }()
+    }
+
+    //刻度
+    function getScale(num){
+        num = num || 10;
+        var i;
+        var html = '';
+        var s = 10;
+        for(i=0;i<num;i++){
+            html += '<li style="top:'+ (i*s-1) +'px"><i>'+i*s+'</i></li>';
+        }
+        $('.scale').append(html);
+    }
+    getScale(40);
+
+    function init(){
+        var str= navigator.userAgent.toLowerCase();
+        var ver=str.match(/cpu iphone os (.*?) like mac os/);
+        var num = ver[1].replace(/_/g,".").split('.')[0] * 1;
+        if(ver){
+            //alert("你当前的Ios系统版本为："+ver[1].replace(/_/g,"."));
+            if(num >= 10){
+                ios_10_p();
+            }else{
+                ios_10_r();
+            }
+        }
+    }
+    if(browser.versions.ios){
+        init();
+    }
+
+    function headFocus(){
+        $('#abc').on('focus', function(){
+            $('#abc').off();
+            $('#eee').focus();
+            $('.layer').show();
+            //隐藏
+            $('.but').addClass('opacity');
+        })
+        $('#abc').on('blur', function(){
+            $('.but').removeClass('opacity absolute').css({top:'auto'});
+        })
+    }
+    function ios_10_p(){
+        headFocus();
+        $('#eee').on('focus', function(){
+            setTimeout(function(){
+                var $butTop = $('.but').offset().top;
+                var $winTop = $(window).scrollTop();
+                var diff = $butTop - $winTop;
+                var diff2 = window.innerHeight - $winTop;
+                $('.span').append($winTop + '-');
+                $('.span').append($butTop + '-');
+                $('.span').append(diff + '-');
+                $('.span').append(diff2 + '-');
+
+
+                $(window).scrollTop(0);
+                $('.but').addClass('absolute').css({top:(diff2 - $('.but').innerHeight() + 20) + 'px'});
+
+                //显示
+                $('.but').removeClass('opacity');
+                //$('body').append('<div style="position:fixed;background-color:red;left:0;top:0;width:100%;height:'+diff2+'px;"></div>');
+
+                setTimeout(function(){
+                    $('#abc').focus();
+                    $('.layer').hide();
+                    headFocus();
+                }, 300)
+            }, 400)
+        })
+    }
+
+    function ios_10_r(){
+        $('#abc').on('focus', function(){
+            setTimeout(function(){
+                var $butTop = $('.but').offset().top;
+                var $winTop = $(window).scrollTop();
+                var diff = $butTop - $winTop;
+                var diff2 = window.innerHeight - $winTop;
+                //$(window).scrollTop(0);
+
+
+                var diff = window.innerHeight - $('.but').innerHeight();
+                $('.but').css({top:diff + 'px'});
+            }, 1000)
+        })
+        $('#abc').on('blur', function(){
+            $('.but').css({top:'auto'});
+        })
+    }
+</script>
+</body>
+</html>
